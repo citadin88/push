@@ -1,5 +1,3 @@
-
-document.addEventListener('DOMContentLoaded', function() {
  function simulateDelayedClick(x, y) {
       var clickEvent = new MouseEvent('click', {
         view: window,
@@ -57,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var randomX = rect.left + Math.random() * rect.width;
         var randomY = rect.top + Math.random() * rect.height;
         simulateMouseClick(randomX, randomY);
-      }, 1000); // 2000 milliseconds = 2 seconds
+      }, 2000); // 2000 milliseconds = 2 seconds
     }
 
     // Delayed start of the interval
-    setTimeout(startInterval, 1000); // Start after 2 seconds
+    setTimeout(startInterval, 2000); // Start after 2 seconds
