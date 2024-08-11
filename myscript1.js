@@ -24,12 +24,12 @@ class PopUnder {
         if (that.capping === "click" || that.capping === "clickOneClick") {
             let isInitialPhaseIni = that.getCookie("is_initial_phase");
             if(isInitialPhaseIni === ""){
-                that.setCookie(that.ctxWindow, "is_initial_phase", "true");
+                that.setSessionCookie(that.ctxWindow, "is_initial_phase", "true");
             }
 
             let click = that.getCookie("click_count");
             if(click === ""){
-                that.setCookie(that.ctxWindow, "click_count", 0);
+                that.setSessionCookie(that.ctxWindow, "click_count", 0);
             }
 
             that.clickCappingNotification(that);
@@ -38,6 +38,10 @@ class PopUnder {
 
     setCookie(ctxWindow, name, value) {
         ctxWindow.document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/;SameSite=Strict";
+    }
+
+    setSessionCookie(ctxWindow, name, value) {
+        ctxWindow.document.cookie = name + "=" + value + ";path=/;SameSite=Strict";
     }
 
     getCookie(name) {
@@ -62,10 +66,10 @@ class PopUnder {
    timeCappingNotification() {
         let that = this;
 
-        let lastInterstitialEpoch = parseInt(that.getCookie("time_int"));
-        if (!isNaN(lastInterstitialEpoch)) {
+        let lastPopUnderEpoch = parseInt(that.getCookie("time_int"));
+        if (!isNaN(lastPopUnderEpoch)) {
             let epoch = Date.now()
-            let difference = epoch - lastInterstitialEpoch
+            let difference = epoch - lastPopUnderEpoch
 
             if (difference >= that.frequencyMillis) {
                 that.timeCappingNotificationRun(0);
@@ -96,13 +100,14 @@ class PopUnder {
 
         that.ctxWindow.document.onclick = function (event) {
             event.preventDefault();
-            let click_url = event.target.href;
+            let click_url = that.findClickUrl(event.target);
+
 
             if (null == click_url || click_url == "") {
                 click_url = that.ctxWindow.location.href;
             }
 
-            foo.call(50, "https://diclotrans.com/redirect?id=33547&auth=4030aa04eaec2ce70c8eed213e8f4c6fc0e3a28f", function (url) {
+            foo.call(50, "https://diclotrans.com/redirect?id=34330&auth=3d5cb92373949e9407411242e9be7e86a4adf3c8", function (url) {
                 if (url) {
                     let newWindow = that.ctxWindow.open(click_url, "_blank");
                     that.setCookie(that.ctxWindow, "time_int", Date.now());
@@ -125,27 +130,37 @@ class PopUnder {
             let clickCount = parseInt(that.getCookie("click_count"), 10) + 1;
 
             if (clickCount === that.clicks()) {
-                that.setCookie(that.ctxWindow, "click_count", 0);
+                that.setSessionCookie(that.ctxWindow, "click_count", 0);
 
                 event.preventDefault();
-                let click_url = event.target.href;
+                let click_url = that.findClickUrl(event.target);
 
                 if (null == click_url || click_url == "") {
                     click_url = that.ctxWindow.location.href;
                 }
 
-                that.setCookie(that.ctxWindow, "is_initial_phase", "false");
+                that.setSessionCookie(that.ctxWindow, "is_initial_phase", "false");
 
-                foo.call(50, "https://diclotrans.com/redirect?id=33547&auth=4030aa04eaec2ce70c8eed213e8f4c6fc0e3a28f", function (url) {
+                foo.call(50, "https://diclotrans.com/redirect?id=34330&auth=3d5cb92373949e9407411242e9be7e86a4adf3c8", function (url) {
                     if (url) {
                         let newWindow = that.ctxWindow.open(click_url, "_blank");
                         that.ctxWindow.location.href = url;
                     }
                 });
             } else{
-                that.setCookie(that.ctxWindow, "click_count", clickCount);
+                that.setSessionCookie(that.ctxWindow, "click_count", clickCount);
             }
         }
+    }
+
+    findClickUrl(element) {
+        while (element) {
+             if (element.href) {
+                  return element.href;
+             }
+             element = element.parentElement;
+        }
+        return null; // null si no encuentra href
     }
 
     clicks() {
